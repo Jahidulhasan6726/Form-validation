@@ -1,0 +1,155 @@
+<html>
+<head>
+    <title>NodeJs Form Submission with validation</title>
+    <script src="./Scripts/jquery.js"></script>
+    <style type="text/css">
+        body {
+            font-family: 'Century Gothic', sans-serif;
+            font-size: .90em;
+        }
+
+        .row {
+            display: flex;
+            flex-direction: row;
+            justify-content: flex-start;
+            align-items: center;
+            margin-bottom: 10px;
+        }
+
+            .row label {
+                width: 120px;
+                text-align: right;
+                padding-right: 10px;
+            }
+
+            .row .input {
+                width: 300px;
+            }
+
+        #error {
+            color: red;
+            margin-left: 60px;
+        }
+    </style>
+
+</head>
+<body>
+    <div class="container">
+        <h3>Your Profile</h3>
+        <div id="error" style="display:none;">
+            <ul>
+            </ul>
+        </div>
+        <div id="messages" style="display:none;"></div>
+
+        <form method="post" action="/process" id="f">
+            <div class="row">
+                <label for="fname">Name</label>
+                <input class="input" type="text" name="fname" id="fname" />
+            </div>
+            <div class="row">
+                <label for="email">Email</label>
+                <input class="input" type="email" name="email" id="email" />
+            </div>
+            <div class="row">
+                <label for="dob">Date of Birth</label>
+                <input class="input" type="date" name="dob" id="dob" />
+            </div>
+            <div class="row">
+                <label for="city">City</label>
+                <select class="input" name="city" id="city">
+                    <option value="Dhaka">Dhaka</option>
+                    <option value="Rajshahi">Rajshahi</option>
+                    <option value="Pabna">Pabna</option>
+                    <option value="Bogura">Bogura</option>
+                    <option value="Bogura">Khulna</option>
+                </select>
+            </div>
+            <div class="row">
+                <label for="address">Address</label>
+                <textarea class="input" name="address" id="address"></textarea>
+            </div>
+            <div class="row">
+                <label>Gender</label>
+                <input type="radio" name="gender" id="male" /> Male
+                <input type="radio" name="gender" id="female" /> Female
+            </div>
+            <div class="row">
+                <label>Interest</label>
+                <input type="checkbox" name="interest" id="programming" /> Programming
+                <input type="checkbox" name="interest" id="networking" /> Networking
+                <input type="checkbox" name="interest" id="multimedia" /> Multimedia
+            </div>           
+            <div class="row">
+                <label>&nbsp;</label>
+                <button type="button" id="submit">Submit</button>
+            </div>
+        </form>
+    </div>
+    <script type="text/javascript">
+            $(document).ready(() => {
+                $("#submit").click(() => {
+                    var valid = true;
+                    var msg = '';
+
+                    if ($('#fname').val() == '') {
+                        valid = false;
+                        msg += "<li>full name is required!!!</li>"
+                    }
+                    if ($('#email').val() == '') {
+                        valid = false;
+                        msg += "<li>Email is required!!!</li>"
+                    }
+                    if ($('#dob').val() == '') {
+                        valid = false;
+                        msg += "<li>Date of birth is required!!!</li>"
+                    }
+                    if ($('#city').val() == '') {
+                        valid = false;
+                        msg += "<li>City is required!!!</li>"
+                    }
+                    if ($("input[name='gender']:checked").length < 1) {
+                        valid = false;
+                        msg += "<li>Gender is required!!!</li>"
+                    }
+                    if ($("input[name='interest']:checked").length < 1) {
+                        valid = false;
+                        msg += "<li>Interest is required!!!</li>"
+                    }
+                    if ($('#address').val() == '') {
+                        valid = false;
+                        msg += "<li>Address is required!!!</li>"
+                    }
+
+                    if (!valid) {
+                        $('#error ul').html(msg);
+                        $('#error').show();
+                    }
+                    else {
+                        $('#error ul').html('');
+                        $('#error').hide();
+
+                        console.log('Submitting....');
+                        console.log($('#f').serialize());
+                        $.ajax({
+                            type: "POST",
+                            url: '/process',
+                            dataType: 'json',
+                            data: $('#f').serialize()
+                        }).done(r => {
+                            console.log(r);
+                            $('#messages').html(
+                                `<ul>
+                                    <li>Full name :${r.fname}</li>
+                                    <li>Email :${r.email}</li>
+                                    <li>DOB :${r.dob}</li>
+                                    <li>Gender :${r.gender}</li>
+                                </ul>
+                                `).show();
+                        });
+                    }
+                })
+            });
+    </script>
+</body>
+</html>
